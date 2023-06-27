@@ -2,6 +2,7 @@
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Persistence.Context;
 using CleanArchitecture.Persistence.Services;
+using CleanArchitecture.WebApi.Middleware;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ string connectionString = builder.Configuration.GetConnectionString("SqlServer")
 
 
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddTransient<ExceptionMiddleware>(); // çağırıldığı her zaman 1 tane instance oluşturur
 
 builder.Services.AddAutoMapper(typeof(CleanArchitecture.Persistence.AssemblyReference).Assembly);
 // Add services to the container.
@@ -36,6 +38,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddlewareExtensions();
 
 app.UseHttpsRedirection();
 
