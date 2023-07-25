@@ -15,4 +15,6 @@ public sealed class User : IdentityUser<string>
     }
 
     public string NameLastName { get; set; } // firstName + lastName (custom)
+    public string RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpires { get; set; } // refresh token'ın bitme süresi
 }
