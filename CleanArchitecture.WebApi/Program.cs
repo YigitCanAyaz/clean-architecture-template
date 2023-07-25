@@ -1,10 +1,17 @@
 ﻿using CleanArchitecture.Application.Behaviors;
 using CleanArchitecture.Application.Services;
+using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Repositories;
+using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Persistence.Context;
+using CleanArchitecture.Persistence.Repositories;
 using CleanArchitecture.Persistence.Services;
 using CleanArchitecture.WebApi.Middleware;
+using CleanArchitecture.WebApi.OptionsSetup;
 using FluentValidation;
+using GenericRepository;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,11 +20,26 @@ string connectionString = builder.Configuration.GetConnectionString("SqlServer")
 
 
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddTransient<ExceptionMiddleware>(); // çağırıldığı her zaman 1 tane instance oluşturur
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+
+builder.Services.ConfigureOptions<JwtOptionsSetup>();
+builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+builder.Services.AddAuthentication().AddJwtBearer();
 
 builder.Services.AddAutoMapper(typeof(CleanArchitecture.Persistence.AssemblyReference).Assembly);
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequireUppercase = false;
+}).AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(CleanArchitecture.Presentation.AssemblyReference).Assembly);
 
