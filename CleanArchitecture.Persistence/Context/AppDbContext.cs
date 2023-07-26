@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Persistence.Context;
 
-public sealed class AppDbContext : IdentityDbContext<User, IdentityRole, string>
+public sealed class AppDbContext : IdentityDbContext<User, Role, string>
 {
     //AppDbContext context = new();
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
